@@ -6,16 +6,31 @@ import (
 	"github.com/endobit/oui"
 	"log"
 	"os"
+	"regexp"
 	"strings"
 )
 
+type addrStruct struct {
+	IP     string
+	MAC    string
+	Vendor string
+}
+
 func main() {
 	//Get input
-	input := parseInput()
+	inputs := parseInput()
 
-	//Determin if a single input was passed, or a multiple imput. returns bool
-	single := singleInputCheck(input)
-	fmt.Println(single)
+	//Determin if a single input was passed.
+	if len(inputs) == 1 {
+		singleInput(inputs[0])
+
+	} else {
+	//Multipe inputs
+		multipleInput(inputs)
+	}
+
+	//single := singleInputCheck(input)
+	//fmt.Println(single)
 
 /*
 	//If only one input, process as single input
@@ -29,37 +44,37 @@ func main() {
 }
 
 //Parse inputs
-func parseInput() string {
-	var input string
+func parseInput() []string {
+	var input []string
 	
 	//If onne value was wassed at runtime, assume this is the address
 	if len(os.Args) >= 2 {
-		input = os.Args[1]
+		input = append(input, os.Args[1])
 	
 	} else { 
 	//If no values were passed at runtime, prompt the user for single address, or multi address lookup
-		fmt.Println("\nMac address or addresses to convert: ")	
+		fmt.Println("\nMac address or addresses to convert (press enter twice): ")
 		reader := bufio.NewReader(os.Stdin)
-		dinput, err := reader.ReadString('\n')
-		if err != nil {
-			log.Fatal("Could not get mac address from user.")
+
+		for {
+			line, err := reader.ReadString('\n')
+			if err != nil {
+				fmt.Println("Error reading input:", err)
+			}
+
+			// Trim whitespace from the line
+			line = strings.TrimSpace(line)
+
+			// If the line is empty, terminate input
+			if line == "" {
+				break
+			}
+
+			input = append(input, line)
 		}
-		input = strings.TrimSpace(dinput)
-	
-	}
+	} 
 
 	return input
-}
-
-//Determin if a single input was passed, or a multiple imput.
-func singleInputCheck(input string) bool {
-	//Check how many new line characters are in the string
-	lineCount := strings.Count(input, "\n")
-	fmt.Println(lineCount)
-
-	return false
-
-
 }
 
 func singleInput(input string) {
@@ -78,9 +93,16 @@ func singleInput(input string) {
 }
 
 func multipleInput(inputs []string) {
+	var addrList addrStruct
+	macRegex := regexp.MustCompile(`(?i)(?:[0-9A-F]{2}[:-]?){5}[0-9A-F]{2}`)
 	
-	//Print results
-	fmt.Println(inputs)
+	//Iterate through inputs
+	for _, input := range inputs {
+		mac := macRegex.FindString(input)
+		fmt.Println(input, mac)
+
+	}
+	_=addrList
 
 }
 
