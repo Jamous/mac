@@ -82,6 +82,34 @@ Installing
 No install is needed. Just add mac to your system path!
 
 
+Add to bash
+-----------
+Using command_not_found_handle in bash we can make bash run this program any time a mac address is entered. Add the below config to your bash config.
+
+```
+# Handle when command is not found
+command_not_found_handle() {
+    #If command looks like a mac address, use mac
+    if check_mac "$1"
+    then
+        mac "$1"
+    fi
+}
+
+
+# Function to check if a string is a mac address
+check_mac() {
+    local standard_regex='\b([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})\b'
+    local cisco_regex='\b([0-9A-Fa-f]{4}\.){2}[0-9A-Fa-f]{4}\b'
+    local string=$1
+    if [[ $string =~ $standard_regex ]] || [[ $string =~ $cisco_regex ]]; then
+        return 0
+    else
+        return 1
+    fi
+}
+```
+
 Version
 -------
 0.1 - 05/7/24
