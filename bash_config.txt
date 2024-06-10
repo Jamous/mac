@@ -1,0 +1,23 @@
+Adding the below code to your bashrc file will call mac as an alias if a mac address is input into the terminal.
+
+# Handle when command is not found
+command_not_found_handle() {
+    #If command looks like a mac address, use mac
+    if check_mac "$1"
+    then
+        mac "$1"
+    fi
+}
+
+
+# Function to check if a string is a mac address
+check_mac() {
+    local standard_regex='\b([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})\b'
+    local cisco_regex='\b([0-9A-Fa-f]{4}\.){2}[0-9A-Fa-f]{4}\b'
+    local string=$1
+    if [[ $string =~ $standard_regex ]] || [[ $string =~ $cisco_regex ]]; then
+        return 0
+    else
+        return 1
+    fi
+}
