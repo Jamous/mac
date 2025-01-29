@@ -2,13 +2,16 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
-	"github.com/endobit/oui"
-	"github.com/go-gota/gota/dataframe"
 	"log"
+	"net"
 	"os"
 	"regexp"
+	"sort"
 	"strings"
+
+	"github.com/endobit/oui"
 )
 
 type addrStruct struct {
@@ -18,6 +21,7 @@ type addrStruct struct {
 	Cisco     string
 	Lowercase string
 	Uppercase string
+	netIP     net.IP
 }
 
 func main() {
@@ -109,8 +113,11 @@ func multipleInput(inputs []string) {
 		}
 	}
 
+	//Sort results
+	sortedList := sortResults(addrList)
+
 	//Write results
-	writeResults(addrList)
+	writeResults(sortedList)
 }
 
 func findMac(input string) string {
@@ -179,6 +186,23 @@ func findVend(mac string) string {
 	return vendor
 }
 
+// Sorts results by IP address
+func sortResults(addrList []addrStruct) []addrStruct {
+	//We know the size of the slice, so lets go ahead and preallocate it.
+	sortedList := make([]addrStruct, 0, len(addrList))
+
+	//We will add NetIP to the slice
+	for _, addr := range addrList {
+		sortedList = append(sortedList, addrStruct{IP: addr.IP, Vendor: addr.Vendor, Dashed: addr.Dashed, Cisco: addr.Cisco, Lowercase: addr.Lowercase, Uppercase: addr.Uppercase, netIP: net.ParseIP(addr.IP)})
+	}
+
+	//Sort slice by NetIP
+	sort.Slice(sortedList, func(i, j int) bool {
+		return bytes.Compare(sortedList[i].netIP, sortedList[j].netIP) < 0
+	})
+
+	return sortedList
+}
 
 func writeResults(addrList []addrStruct) {
 	//Print results
@@ -187,10 +211,10 @@ func writeResults(addrList []addrStruct) {
 	}
 
 	//Convert to dataframe and output to csv
-	data := dataframe.LoadStructs(addrList)
-	out := makeCSV("mac.csv")
-	defer out.Close()
-	data.WriteCSV(out)
+	//data := dataframe.LoadStructs(addrList)
+	//out := makeCSV("mac.csv")
+	//defer out.Close()
+	//data.WriteCSV(out)
 }
 
 func makeCSV(csvName string) *os.File {
