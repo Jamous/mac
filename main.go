@@ -87,6 +87,7 @@ func singleInput(input string) {
 	fmt.Println(macMap["cisco"])
 	fmt.Println(macMap["lowercase"])
 	fmt.Println(macMap["uppercase"])
+	fmt.Println(macMap["uppercase_clean"])
 }
 
 func multipleInput(inputs []string) {
@@ -171,10 +172,11 @@ func convertMac(input string) (map[string]string, string) {
 
 	//Convert to useable formats
 	macMap := map[string]string{
-		"dashed":    fmt.Sprintf("%s-%s-%s-%s-%s-%s", input[:2], input[2:4], input[4:6], input[6:8], input[8:10], input[10:]),
-		"cisco":     fmt.Sprintf("%s.%s.%s", input[:4], input[4:8], input[8:]),
-		"lowercase": fmt.Sprintf("%s:%s:%s:%s:%s:%s", input[:2], input[2:4], input[4:6], input[6:8], input[8:10], input[10:]),
-		"uppercase": strings.ToUpper(fmt.Sprintf("%s:%s:%s:%s:%s:%s", input[:2], input[2:4], input[4:6], input[6:8], input[8:10], input[10:])),
+		"dashed":          fmt.Sprintf("%s-%s-%s-%s-%s-%s", input[:2], input[2:4], input[4:6], input[6:8], input[8:10], input[10:]),
+		"cisco":           fmt.Sprintf("%s.%s.%s", input[:4], input[4:8], input[8:]),
+		"lowercase":       fmt.Sprintf("%s:%s:%s:%s:%s:%s", input[:2], input[2:4], input[4:6], input[6:8], input[8:10], input[10:]),
+		"uppercase":       strings.ToUpper(fmt.Sprintf("%s:%s:%s:%s:%s:%s", input[:2], input[2:4], input[4:6], input[6:8], input[8:10], input[10:])),
+		"uppercase_clean": strings.ToUpper(input),
 	}
 
 	return macMap, input
